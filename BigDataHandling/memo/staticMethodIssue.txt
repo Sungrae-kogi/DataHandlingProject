@@ -1,0 +1,8 @@
+Cannot make a static reference to the non-static method countData(BufferedInputStream, byte[]) from the type DataHandling
+
+main 메소드 내에서 메소드 기능 분리 중 발생한 에러로.
+
+간단하게 해결해버리려면 분리한 메소드에 static을 붙여버리면 해결이지만 이건 당장 실행은 되지만 설계가 무너진것이나 마찬가지라 원인을 찾아보자면.
+
+> 컴파일 순서에서 문제가 발생하기때문이다, 다른 멤버보다 static 멤버가 먼저 컴파일되기 때문에, static 멤버의 컴파일 시점에서는 static으로 선언하지 않았던 메소드나 필드가 아직 정의되지 않은 상태이기 때문에.
+만드는 프로그램은 그냥 메인 메소드에서 함수를 불러다가 쓰는 거기 때문에 그냥 만든 메소드에 static을 붙여서 사용해도 상관없을것.
