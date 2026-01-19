@@ -1,0 +1,43 @@
+LinkedList , ArrayList
+
+LinkedList -> 각 노드가 다음 노드의 주소정보, 이전 노드의 주소정보를 보유하고있는 구조로 삽입삭제가 빈번한 경우에 유효
+	-> 삭제 발생시 (해당 노드의 next 주소를 prev 노드의 next에 연결, next 노드의 prev를 해당 노드의 prev로 연결) 하는 간단한 작업으로 오버헤드가 적은반면.
+	-> ArrayList는 삭제 발생시 배열의 주소들을 하나씩 앞으로 당기는 O(n)의 작업이 발생.
+
+/**
+
+	List<String> priorityList = new LinkedList<>(); //일 때
+
+	// 사용중인 writer 있음
+            if (priorityList.contains(year)) {
+                priorityList.remove(year); // 기존 값 삭제
+                priorityList.add(year); // 맨 마지막에 값 넣기
+                bw = bwMap.get(year);
+            }
+            // 사용중인 writer 없음
+            else {
+                // writer 20개만 유지
+                if (priorityList.size() >= bwMax) {
+                    String oldYear = priorityList.get(0);
+                    priorityList.remove(oldYear);
+
+                    BufferedWriter oldBw = bwMap.get(oldYear);
+                    oldBw.close();
+                    bwMap.remove(oldYear);
+                }
+                if (useYear.contains(year)) {
+                    bw = new BufferedWriter(new FileWriter("./data/" + year + ".dat", true));
+                } else {
+                    bw = new BufferedWriter(new FileWriter("./data/" + year + ".dat"));
+                }
+                useYear.add(year);
+                priorityList.add(year);
+                bwMap.put(year, bw);
+            }
+
+**/
+
+연결리스트 구조를 생각하여 연결리스트에 year 가 존재할 경우, 해당 데이터를 삭제후 맨 뒤에 값을 추가하여 year데이터의 최신화를 간단하게 구현.
+반복진행시 연결리스트의 [0] 인덱스에는 가장 사용되는 빈도가 적은 year 값이 자연스럽게 존재하게되는것. -> 정렬없이 정렬구현이 완료.
+
+-> 가장 오래된 year 값을 제외시킨다.

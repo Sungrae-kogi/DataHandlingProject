@@ -11,8 +11,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,18 +25,30 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.apache.commons.cli.Options;
+
+
+
 public class DataHandling {
-	final String inputFileName = "data/n.kor.dat";
-//	final String outputFileName = "data/year.dat";
+	private String inputFileName;
 
 	// main
 	public static void main(String[] args) {
 
 		DataHandling dataHandling = new DataHandling();
+
+		//
+		Options options = new Options();
+
+
+
+		dataHandling.withoutProperties();
+
 		dataHandling.run();
 
 	}
@@ -129,11 +143,31 @@ public class DataHandling {
 	}
 
 	private FileWriter createFileWriter(String year) throws IOException {
-		return new FileWriter("data/" + year + ".dat");
+		return new FileWriter("data/data_splitted" + year + ".dat");
 	}
 
 	private FileWriter reWriteFileWriter(String year, boolean isAppend) throws IOException {
-		return new FileWriter("data/" + year + ".dat", isAppend);
+		return new FileWriter("data/data_splitted" + year + ".dat", isAppend);
+	}
+
+	private void withoutProperties() {
+		inputFileName = "data/n.kor.dat";
+	}
+
+	private void initProperties(String path) {
+		// TODO Auto-generated method stub
+		Properties prop = new Properties();
+
+		try (InputStream iStream = new FileInputStream(path);) {
+			prop.load(iStream);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("properties Exception");
+			e.printStackTrace();
+		}
+
+		inputFileName = prop.getProperty("DATA_FILE");
+
 	}
 
 	// 대용량 데이터의 경우 메모리 이슈로 지속적으로 데이터를 들고 있을 수가없고, 있을 필요도 없다. 따라서 Collections가 처리에
@@ -157,8 +191,12 @@ public class DataHandling {
 					break;
 				}
 
-				if (str.startsWith("``0:"))
+				if (str.startsWith("``0:")) {
 					count++;
+					if(count % 100000 == 0)
+						System.out.println(count);
+				}
+
 			}
 		} catch (IOException e) {
 			System.out.println("countData Exception");
@@ -199,6 +237,7 @@ public class DataHandling {
 
 					// 파일의 첫 부분이 아니면서 값이 존재한다면
 					if (curr_row != -1) {
+						perColumnMaxSize.put(curr_row, Math.max(readBuffSize, readBuffSize));
 						if (!perColumnMaxSize.containsKey(curr_row)) {
 							perColumnMaxSize.put(curr_row, readBuffSize);
 						} else {
@@ -303,7 +342,7 @@ public class DataHandling {
 						existYear.add(year);
 
 						// Writer 생성
-						bWriter = new BufferedWriter(reWriteFileWriter(year,true));
+						bWriter = new BufferedWriter(reWriteFileWriter(year, true));
 
 						// Writer를 HashMap 에 "year : bWriter"의 key-value 쌍 저장
 						bWriters.put(year, bWriter);
@@ -350,9 +389,10 @@ public class DataHandling {
 					} else {
 						// 새로운 year 값을 받았는데 existYear.size() == 5 인 case
 						// existYear배열의 마지막 index에 year 입력
-						// Queue 에서 맨 앞의 값을 poll() 해서 year값 반환 -> Queue의 맨 뒤에 year를 add() -> 가장 오래 안 쓰인 year을 제거
+						// Queue 에서 맨 앞의 값을 poll() 해서 year값 반환 -> Queue의 맨 뒤에 year를 add() -> 가장 오래 안 쓰인
+						// year을 제거
 
-						//FIXME Queue를 사용하면안된다, 중복값이 다시 발생, 가장 오래된 값 먼저 제거 하면서 중복을 제거하는 방법 찾아야함.
+						// FIXME Queue를 사용하면안된다, 중복값이 다시 발생, 가장 오래된 값 먼저 제거 하면서 중복을 제거하는 방법 찾아야함.
 						String oldYear = existYear.poll();
 						existYear.add(year);
 
@@ -360,7 +400,7 @@ public class DataHandling {
 						bWriters.get(oldYear).close();
 
 						// 새로운 bWriters 인스턴스 생성
-						bWriter = new BufferedWriter(reWriteFileWriter(year,true));
+						bWriter = new BufferedWriter(reWriteFileWriter(year, true));
 
 						// 쓰기 실행
 						// ``0: 데이터 저장

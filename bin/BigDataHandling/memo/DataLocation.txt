@@ -1,0 +1,19 @@
+큰 데이터 파일을 
+
+1. src/main/java
+2. src/main/resources
+3. src/test/... 
+4. target
+5. build/ 
+
+등의 장소에 위치시키면 빌드에 관여하게되면서 큰 데이터 파일의 복사가 발생하면서 JAR 내부에 패키징 되면서 빌드가 급격히 느려지는 문제가 발생함.
+
+따라서, resources 같은 폴더는 "작은, 정적인 파일들 yml,xml,json, 등 의 파일만 위치시키고
+큰 데이터 같은 파일은 프로젝트의 외부에 위치시킨다.
+
+ex) project-root/data 같은 장소.
+
+왜냐하면 그 외의 폴더 data, docs, logs, tmp 등은 빌드에 관여하지 않아 빌드 스캔 대상이 아니기 때문.
+
+
+	
