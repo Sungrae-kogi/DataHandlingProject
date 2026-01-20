@@ -16,3 +16,7 @@ Thumbs.db
 
 # ===== logs =====
 *.log
+
+.project
+.classpath
+.settings/

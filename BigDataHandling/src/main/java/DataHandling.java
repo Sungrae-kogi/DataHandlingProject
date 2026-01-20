@@ -30,7 +30,7 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.apache.commons.cli.Options;
+import org.apache.commons.cli.*;
 
 
 
@@ -42,12 +42,30 @@ public class DataHandling {
 
 		DataHandling dataHandling = new DataHandling();
 
-		//
+		//	입력 예시 : java -jar test.jar --properties /home/whvkek/DataHandling/config/application_prod.properties
+
 		Options options = new Options();
+		options.addOption(
+				Option.builder("c")
+				.longOpt("properties")
+				.hasArg()
+				.build());
+
+		CommandLineParser parser = new DefaultParser();
+		CommandLine cmd = null;
+
+		try {
+			cmd = parser.parse(options,args);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		String path = cmd.getOptionValue("properties");
 
 
 
-		dataHandling.withoutProperties();
+		dataHandling.initProperties(path);
 
 		dataHandling.run();
 
